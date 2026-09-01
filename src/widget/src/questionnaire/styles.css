@@ -1,0 +1,156 @@
+.shell {
+  box-sizing: border-box;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--colorNeutralForeground1);
+  background: var(--colorNeutralBackground1);
+  border-top: 4px solid var(--gea-accent, var(--colorBrandStroke1, #2563EB));
+  border-radius: 10px;
+  box-shadow: var(--shadow8, 0 1px 2px rgba(0, 0, 0, 0.14), 0 4px 12px rgba(0, 0, 0, 0.10));
+}
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.title { margin: 8px 0 4px; font-size: 20px; line-height: 28px; font-weight: 600; }
+.progressBlock { display: grid; gap: 6px; }
+.answeredCards {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.answeredCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 7px 12px;
+  width: 100%;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1px solid var(--gea-card-border, var(--colorNeutralStroke2, #E5E7EB));
+  border-left: 3px solid var(--gea-secondary, #7C3AED);
+  background: var(--gea-card-bg, var(--colorNeutralBackground2));
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: box-shadow 0.12s, border-left-color 0.12s;
+}
+.answeredCard:hover {
+  border-left-color: var(--gea-accent, var(--colorBrandStroke1, #2563EB));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+}
+.answeredCard:focus-visible {
+  outline: 2px solid var(--gea-accent, var(--colorBrandStroke1, #2563EB));
+  outline-offset: 2px;
+}
+.answeredCard__question {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--colorNeutralForeground2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.answeredCard__answer {
+  flex-shrink: 0;
+  max-width: 45%;
+  font-size: 12px;
+  line-height: 16px;
+  font-weight: 600;
+  color: var(--gea-status, var(--colorNeutralForeground1));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.answeredCard__editIcon {
+  flex-shrink: 0;
+  font-size: 15px;
+  line-height: 1;
+  color: var(--colorNeutralForeground3);
+  opacity: 0.6;
+  display: flex;
+  align-items: center;
+}
+.questionCard {
+  display: grid;
+  gap: 14px;
+  min-height: 0;
+  position: relative;
+}
+.questionCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gea-accent, #2563EB) 0%, var(--gea-secondary, #7C3AED) 100%);
+  border-radius: 4px 4px 0 0;
+}
+.questionCard__prompt {
+  padding-top: 4px;
+  font-size: 18px;
+  line-height: 1.45;
+  font-weight: 700;
+  color: var(--colorNeutralForeground1);
+}
+.helpText { color: var(--colorNeutralForeground2); }
+.questionCallout {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--gea-card-bg, var(--colorNeutralBackground2));
+  border-left: 3px solid var(--gea-secondary, #7C3AED);
+  border-radius: 6px;
+}
+.questionCallout__icon {
+  flex-shrink: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--gea-secondary, #7C3AED);
+}
+.questionCallout__text {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--colorNeutralForeground2);
+}
+.optionItem {
+  display: grid;
+  gap: 2px;
+  padding: 5px 8px 5px 5px;
+  border-radius: 6px;
+  border-left: 2px solid transparent;
+  transition: background 0.12s, border-left-color 0.12s;
+}
+.optionItem--selected {
+  background: var(--gea-card-bg, var(--colorNeutralBackground2));
+  border-left-color: var(--gea-accent, #2563EB);
+}
+.optionNote {
+  margin: 0;
+  padding: 0 0 0 28px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--colorNeutralForeground3);
+}
+.checkboxStack { display: grid; gap: 8px; }
+.navRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 2px;
+}
+.confirmed { justify-items: start; }
+.confirmedAnswerList { display: grid; gap: 8px; width: 100%; }
+.confirmedAnswerItem { display: grid; gap: 2px; padding: 8px; border-radius: 6px; background: var(--colorNeutralBackground2); }
+.confirmedAnswerItem__q { color: var(--colorNeutralForeground2); }
+.confirmedAnswerItem__a { color: var(--colorNeutralForeground1); }
+button, input, [role="radio"], [role="checkbox"] { outline-offset: 2px; }
+

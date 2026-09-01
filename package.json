@@ -1,0 +1,24 @@
+{
+  "name": "grant-eligibility-advisor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Microsoft 365 Copilot declarative agent with a custom MCP server and an interactive MCP App widget. Hand-authored, no Agents Toolkit.",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "install:all": "npm install && npm --prefix src/server install && npm --prefix src/widget install",
+    "validate:data": "node data/validate.mjs",
+    "build:widget": "npm --prefix src/widget run build",
+    "build:server": "npm --prefix src/server run build",
+    "build": "npm run validate:data && npm run build:widget && npm run build:server",
+    "dev": "npm --prefix src/server run dev",
+    "start": "npm --prefix src/server start",
+    "inspector": "npx -y @modelcontextprotocol/inspector",
+    "typecheck": "npm --prefix src/widget run typecheck && npm --prefix src/server run typecheck",
+    "test": "npm run build && cd src\\server && node --import tsx --test ..\\..\\tests\\*.test.mjs"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0"
+  }
+}

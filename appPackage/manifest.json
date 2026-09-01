@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.29/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.29",
+  "version": "1.5.4",
+  "id": "30402f20-4656-4687-8656-6e0d1bd6ef39",
+  "developer": {
+    "name": "MCPApp-Sample Contributors",
+    "websiteUrl": "https://github.com/microsoft",
+    "privacyUrl": "https://privacy.microsoft.com/privacystatement",
+    "termsOfUseUrl": "https://www.microsoft.com/servicesagreement"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "Grant Advisor",
+    "full": "Grant Eligibility Advisor"
+  },
+  "description": {
+    "short": "Find grant funds and assess eligibility with guided questionnaires.",
+    "full": "Grant Eligibility Advisor helps users discover available grant and funding programs, open an interactive eligibility questionnaire, and receive criteria-based guidance from Microsoft 365 Copilot."
+  },
+  "accentColor": "#2563EB",
+  "supportsChannelFeatures": "tier1",
+  "composeExtensions": [],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "<your-tenant>.sharepoint.com"
+  ],
+  "copilotAgents": {
+    "declarativeAgents": [
+      {
+        "id": "grantEligibilityAdvisor",
+        "file": "declarativeAgent.json"
+      }
+    ]
+  }
+}

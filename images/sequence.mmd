@@ -1,0 +1,42 @@
+sequenceDiagram
+    participant U as User
+    participant A as Declarative Agent
+    participant S as MCP Server Data Tools
+    participant J as JSON Fund Package
+    participant H as Copilot Host
+    participant W as MCP App Widget
+    U->>A: Ask about grants or funding programs
+    A->>S: list_funds({ category?, search? })
+    S->>J: Read cached fund summaries
+    J-->>S: Fund summaries
+    S-->>A: Fund list
+    A-->>U: Recommend fund options
+    U->>A: Choose a fund
+    A->>S: get_fund_details({ fundId })
+    S->>J: Read fund details and short eligibility summary
+    J-->>S: Browsing data
+    S-->>A: Fund details without rubric
+    A->>S: start_questionnaire({ fundId })
+    S->>J: Read question graph
+    J-->>S: Branching graph with one summary terminal
+    S-->>A: Tool result with _meta.ui.resourceUri
+    A-->>H: Render questionnaire result
+    H-->>W: app.ontoolresult(start_questionnaire result)
+    W-->>U: Show first question
+    loop Branching questionnaire
+        U->>W: Answer current question
+        W->>W: Validate, store, compute next branch
+        W->>H: app.updateModelContext(progress checkpoint)
+        W-->>U: Show next reachable question
+    end
+    W-->>U: Show single summary and confirmation screen
+    U->>W: Confirm final answers
+    W->>H: app.updateModelContext({ fundId, fundName, answers, summary })
+    W->>H: app.sendMessage(readable answer summary)
+    H->>A: New user turn with confirmed answers
+    A->>S: get_eligibility_criteria({ fundId })
+    S->>J: Read criteria and evaluationGuidance
+    J-->>S: Criteria, severity, remediation, guidance
+    S-->>A: Model-visible criteria packet
+    A->>A: Evaluate confirmed answers against fresh criteria packet
+    A-->>U: Outcome and gap analysis

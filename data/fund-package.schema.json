@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/mcpapp-sample/grant-fund-package.schema.json",
+  "title": "MCPApp-Sample Grant Fund Package",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "fund", "evaluationGuidance", "questionGraph", "eligibilityRules"],
+  "properties": {
+    "schemaVersion": { "const": "1.0.0" },
+    "fund": { "$ref": "#/$defs/fund" },
+    "evaluationGuidance": { "$ref": "#/$defs/evaluationGuidance" },
+    "questionGraph": { "$ref": "#/$defs/questionGraph" },
+    "eligibilityRules": { "type": "array", "items": { "$ref": "#/$defs/rule" }, "minItems": 1 }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+    "money": {
+      "type": "object", "additionalProperties": false, "required": ["currency", "min", "max"],
+      "properties": { "currency": { "type": "string", "pattern": "^[A-Z]{3}$" }, "min": { "type": "number", "minimum": 0 }, "max": { "type": "number", "minimum": 0 } }
+    },
+    "fund": {
+      "type": "object", "additionalProperties": false,
+      "required": ["id", "displayName", "shortSummary", "category", "sector", "audience", "fundingRange", "applicationWindow", "questionGraphId", "eligibilityRuleSetId", "recommendationSignals"],
+      "properties": {
+        "id": { "$ref": "#/$defs/id" }, "displayName": { "type": "string", "minLength": 1 }, "shortSummary": { "type": "string", "minLength": 1 },
+        "category": { "type": "string" }, "sector": { "type": "string" }, "audience": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+        "fundingRange": { "$ref": "#/$defs/money" },
+        "applicationWindow": { "type": "object", "additionalProperties": false, "required": ["opens", "deadline", "timezone"], "properties": { "opens": { "type": "string", "format": "date" }, "deadline": { "type": "string", "format": "date" }, "timezone": { "type": "string" } } },
+        "questionGraphId": { "$ref": "#/$defs/id" }, "eligibilityRuleSetId": { "$ref": "#/$defs/id" },
+        "programGuideUrl": { "type": "string", "minLength": 1 },
+        "recommendationSignals": { "type": "object", "additionalProperties": false, "required": ["keywords", "goodFit", "poorFit"], "properties": { "keywords": { "type": "array", "items": { "type": "string" } }, "goodFit": { "type": "array", "items": { "type": "string" }, "minItems": 1 }, "poorFit": { "type": "array", "items": { "type": "string" }, "minItems": 1 } } }
+      }
+    },
+    "evaluationGuidance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["reviewPriorities", "borderlineHandling", "definitions", "communicationEmphasis"],
+      "properties": {
+        "reviewPriorities": { "type": "string", "minLength": 1, "maxLength": 360 },
+        "borderlineHandling": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "definitions": { "type": "string", "minLength": 1, "maxLength": 240 },
+        "communicationEmphasis": { "type": "string", "minLength": 1, "maxLength": 240 }
+      }
+    },
+    "questionGraph": {
+      "type": "object", "additionalProperties": false, "required": ["id", "entryQuestionId", "progress", "questions", "terminals"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "entryQuestionId": { "$ref": "#/$defs/id" }, "progress": { "type": "object", "additionalProperties": false, "required": ["strategy", "unit"], "properties": { "strategy": { "const": "current-path-estimate" }, "unit": { "const": "question" }, "displayHint": { "type": "string" } } }, "questions": { "type": "array", "items": { "$ref": "#/$defs/question" }, "minItems": 1 }, "terminals": { "type": "array", "items": { "$ref": "#/$defs/terminal" }, "minItems": 1 } }
+    },
+    "question": {
+      "type": "object", "additionalProperties": false, "required": ["id", "prompt", "helpText", "answerType", "required", "edges"],
+      "properties": { "id": { "$ref": "#/$defs/id" }, "prompt": { "type": "string", "minLength": 1 }, "helpText": { "type": "string" }, "answerType": { "enum": ["single-select", "multi-select", "boolean", "number", "currency", "date"] }, "required": { "type": "boolean" }, "options": { "type": "array", "items": { "type": "object", "additionalProperties": false, "required": ["value", "label"], "properties": { "value": { "type": "string" }, "label": { "type": "string" }, "helpText": { "type": "string" } } } }, "validation": { "type": "object", "additionalProperties": false, "properties": { "min": { "type": "number" }, "max": { "type": "number" }, "minLength": { "type": "integer", "minimum": 0 }, "maxLength": { "type": "integer", "minimum": 1 }, "pattern": { "type": "string" }, "minDate": { "type": "string", "format": "date" }, "maxDate": { "type": "string", "format": "date" } } }, "edges": { "type": "array", "items": { "$ref": "#/$defs/edge" }, "minItems": 1 } }
+    },
+    "edge": { "type": "object", "additionalProperties": false, "required": ["id", "condition", "target"], "properties": { "id": { "$ref": "#/$defs/id" }, "label": { "type": "string" }, "condition": { "$ref": "#/$defs/condition" }, "target": { "type": "object", "additionalProperties": false, "required": ["type", "id"], "properties": { "type": { "enum": ["question", "terminal"] }, "id": { "$ref": "#/$defs/id" } } } } },
+    "terminal": { "type": "object", "additionalProperties": false, "required": ["id", "status", "title", "message"], "properties": { "id": { "$ref": "#/$defs/id" }, "status": { "enum": ["ready-for-confirmation"] }, "title": { "type": "string" }, "message": { "type": "string" } } },
+    "rule": { "type": "object", "additionalProperties": false, "required": ["id", "criterion", "condition", "severity", "remediation"], "properties": { "id": { "$ref": "#/$defs/id" }, "criterion": { "type": "string" }, "appliesWhen": { "$ref": "#/$defs/condition" }, "condition": { "$ref": "#/$defs/condition" }, "severity": { "enum": ["hard-disqualifier", "soft-advisory"] }, "remediation": { "type": "string" } } },
+    "condition": {
+      "oneOf": [
+        { "type": "object", "required": ["always"], "additionalProperties": false, "properties": { "always": { "type": "boolean" } } },
+        { "type": "object", "required": ["answer", "exists"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "exists": { "type": "boolean" } } },
+        { "type": "object", "required": ["answer", "equals"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "equals": {} } },
+        { "type": "object", "required": ["answer", "notEquals"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "notEquals": {} } },
+        { "type": "object", "required": ["answer", "in"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "in": { "type": "array", "items": {}, "minItems": 1 } } },
+        { "type": "object", "required": ["answer", "includesAny"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "includesAny": { "type": "array", "items": {}, "minItems": 1 } } },
+        { "type": "object", "required": ["answer", "includesAll"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "includesAll": { "type": "array", "items": {}, "minItems": 1 } } },
+        { "type": "object", "required": ["answer", "operator", "value"], "additionalProperties": false, "properties": { "answer": { "type": "string" }, "operator": { "enum": ["lt", "lte", "gt", "gte"] }, "value": { "type": "number" } } },
+        { "type": "object", "required": ["all"], "additionalProperties": false, "properties": { "all": { "type": "array", "items": { "$ref": "#/$defs/condition" }, "minItems": 1 } } },
+        { "type": "object", "required": ["any"], "additionalProperties": false, "properties": { "any": { "type": "array", "items": { "$ref": "#/$defs/condition" }, "minItems": 1 } } },
+        { "type": "object", "required": ["not"], "additionalProperties": false, "properties": { "not": { "$ref": "#/$defs/condition" } } }
+      ]
+    }
+  }
+}

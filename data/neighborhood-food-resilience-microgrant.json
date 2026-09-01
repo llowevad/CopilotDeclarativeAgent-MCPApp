@@ -1,0 +1,550 @@
+{
+  "schemaVersion": "1.0.0",
+  "fund": {
+    "id": "neighborhood-food-resilience-microgrant",
+    "displayName": "Neighborhood Food Resilience Microgrant",
+    "shortSummary": "Small awards for community-led projects that improve reliable access to fresh food in underserved neighborhoods.",
+    "category": "Community resilience",
+    "sector": "Food access",
+    "audience": [
+      "Nonprofit organizations",
+      "Public schools",
+      "Community coalitions with a fiscal sponsor"
+    ],
+    "fundingRange": {
+      "currency": "USD",
+      "min": 5000,
+      "max": 25000
+    },
+    "applicationWindow": {
+      "opens": "2026-09-01",
+      "deadline": "2026-11-15",
+      "timezone": "America/New_York"
+    },
+    "questionGraphId": "food-resilience-questionnaire",
+    "eligibilityRuleSetId": "food-resilience-eligibility-v1",
+    "programGuideUrl": "https://<your-tenant>.sharepoint.com/sites/GrantAdvisor/Shared%20Documents/Program%20Guides/Neighborhood-Food-Resilience-Microgrant-Program-Guide.docx",
+    "recommendationSignals": {
+      "keywords": [
+        "food access",
+        "pantry",
+        "community garden",
+        "fresh produce",
+        "school families"
+      ],
+      "goodFit": [
+        "Applicant is a nonprofit or public school",
+        "Project serves a documented low-access neighborhood",
+        "Request is no more than 25000 USD"
+      ],
+      "poorFit": [
+        "Applicant is an individual or for-profit business",
+        "Project is primarily commercial retail",
+        "Project is outside the service region"
+      ]
+    }
+  },
+  "evaluationGuidance": {
+    "reviewPriorities": "Start with the hard-disqualifier checks: eligible applicant, in-region low-access food focus, request at or below the cap, and non-commercial project type. Treat the pantry partner and match rules as strengthening signals only after hard criteria are satisfied.",
+    "borderlineHandling": "A request even slightly above 25000 USD misses the cap unless the applicant can reduce this fund's ask. A citywide project can meet the service-area rule only when the answer states a clear low-access focus; do not treat general citywide benefit as enough.",
+    "definitions": "Use low-access neighborhood to mean the community served, not the applicant's mailing address. Non-commercial food access includes free distribution, pantry logistics, or community growing; standard retail sales alone remain outside scope.",
+    "communicationEmphasis": "Use practical community-development language. When a gap appears coachable, point to the specific remediation, such as adding a fiscal sponsor, documenting site access, or naming a supplier, without softening hard-disqualifier criteria."
+  },
+  "questionGraph": {
+    "id": "food-resilience-questionnaire",
+    "entryQuestionId": "food-applicant-type",
+    "progress": {
+      "strategy": "current-path-estimate",
+      "unit": "question",
+      "displayHint": "Show answered questions over answered plus shortest remaining reachable questions from the current node."
+    },
+    "questions": [
+      {
+        "id": "food-applicant-type",
+        "prompt": "What type of applicant are you applying as?",
+        "helpText": "Choose the legal entity or sponsor that would receive the grant agreement.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "nonprofit",
+            "label": "Nonprofit organization",
+            "helpText": "Choose this if a 501(c)(3) or equivalent nonprofit would hold and sign the grant agreement."
+          },
+          {
+            "value": "public-school",
+            "label": "Public school or school district",
+            "helpText": "Choose this if a K–12 public school or school district would sign the agreement on behalf of the project."
+          },
+          {
+            "value": "for-profit-business",
+            "label": "For-profit business",
+            "helpText": "A business that generates revenue from commercial operations rather than charitable mission."
+          },
+          {
+            "value": "individual",
+            "label": "Individual resident",
+            "helpText": "A private resident acting without a sponsoring organization or formal legal entity."
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-applicant-eligible",
+            "condition": {
+              "answer": "food-applicant-type",
+              "in": [
+                "nonprofit",
+                "public-school"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-service-area"
+            }
+          },
+          {
+            "id": "food-applicant-not-eligible",
+            "condition": {
+              "answer": "food-applicant-type",
+              "in": [
+                "for-profit-business",
+                "individual"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-service-area"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-service-area",
+        "prompt": "Where will the project primarily serve people?",
+        "helpText": "Use the neighborhood where most benefits will occur, not the applicant office address.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "low-access-neighborhood",
+            "label": "A documented low-access neighborhood",
+            "helpText": "A neighborhood with limited nearby grocery or fresh food options, ideally documented by a food access study or USDA food desert designation."
+          },
+          {
+            "value": "citywide-with-low-access-focus",
+            "label": "Citywide, with a clear low-access focus",
+            "helpText": "The project covers the whole city but deliberately targets and benefits residents in documented low-access areas."
+          },
+          {
+            "value": "outside-region",
+            "label": "Outside the eligible service region",
+            "helpText": "The project's primary beneficiaries are in a county or metro area outside the fund's eligible geographic boundary."
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-service-in-scope",
+            "condition": {
+              "answer": "food-service-area",
+              "in": [
+                "low-access-neighborhood",
+                "citywide-with-low-access-focus"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-request-amount"
+            }
+          },
+          {
+            "id": "food-service-outside-region",
+            "condition": {
+              "answer": "food-service-area",
+              "equals": "outside-region"
+            },
+            "target": {
+              "type": "question",
+              "id": "food-request-amount"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-request-amount",
+        "prompt": "How much funding are you requesting?",
+        "helpText": "Enter the requested grant amount in US dollars. This microgrant caps awards at 25000 USD.",
+        "answerType": "currency",
+        "required": true,
+        "validation": {
+          "min": 1,
+          "max": 100000
+        },
+        "edges": [
+          {
+            "id": "food-amount-within-cap",
+            "condition": {
+              "answer": "food-request-amount",
+              "operator": "lte",
+              "value": 25000
+            },
+            "target": {
+              "type": "question",
+              "id": "food-project-type"
+            }
+          },
+          {
+            "id": "food-amount-over-cap",
+            "condition": {
+              "answer": "food-request-amount",
+              "operator": "gt",
+              "value": 25000
+            },
+            "target": {
+              "type": "question",
+              "id": "food-project-type"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-project-type",
+        "prompt": "Which project type best describes your request?",
+        "helpText": "Pantry, garden, and retail-adjacent projects ask different follow-up questions because their eligibility evidence differs.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "mobile-pantry",
+            "label": "Mobile pantry or fresh food distribution",
+            "helpText": "Distributes free or low-cost food directly to community members, often by vehicle or pop-up site."
+          },
+          {
+            "value": "community-garden",
+            "label": "Community garden or growing site",
+            "helpText": "A shared growing space that produces food for community use, donation, or low-cost sale."
+          },
+          {
+            "value": "commercial-retail",
+            "label": "Commercial retail expansion",
+            "helpText": "A store or market that sells food to paying customers at standard market prices."
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-project-pantry",
+            "condition": {
+              "answer": "food-project-type",
+              "equals": "mobile-pantry"
+            },
+            "target": {
+              "type": "question",
+              "id": "food-pantry-partner"
+            }
+          },
+          {
+            "id": "food-project-garden",
+            "condition": {
+              "answer": "food-project-type",
+              "equals": "community-garden"
+            },
+            "target": {
+              "type": "question",
+              "id": "food-land-access"
+            }
+          },
+          {
+            "id": "food-project-retail",
+            "condition": {
+              "answer": "food-project-type",
+              "equals": "commercial-retail"
+            },
+            "target": {
+              "type": "question",
+              "id": "food-retail-community-benefit"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-pantry-partner",
+        "prompt": "Do you have a named food supplier or distribution partner?",
+        "helpText": "A letter of intent is enough for the proposal stage.",
+        "answerType": "boolean",
+        "required": true,
+        "edges": [
+          {
+            "id": "food-pantry-to-match",
+            "condition": {
+              "answer": "food-pantry-partner",
+              "in": [
+                true,
+                false
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-matching-funds"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-land-access",
+        "prompt": "What is the status of land or site access for the garden?",
+        "helpText": "The site can be owned, leased, or covered by a written use agreement.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "secured",
+            "label": "Secured",
+            "helpText": "The organization owns, leases, or holds a signed written use agreement for the garden site."
+          },
+          {
+            "value": "pending-written-approval",
+            "label": "Pending written approval",
+            "helpText": "A lease or written permission is in active negotiation but has not been signed yet."
+          },
+          {
+            "value": "none",
+            "label": "No site identified",
+            "helpText": "No site has been selected or contacted; the location is still to be determined."
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-land-ready",
+            "condition": {
+              "answer": "food-land-access",
+              "in": [
+                "secured",
+                "pending-written-approval"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-matching-funds"
+            }
+          },
+          {
+            "id": "food-land-not-ready",
+            "condition": {
+              "answer": "food-land-access",
+              "equals": "none"
+            },
+            "target": {
+              "type": "question",
+              "id": "food-matching-funds"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-retail-community-benefit",
+        "prompt": "If retail activity is involved, how will food access benefits be provided?",
+        "helpText": "Commercial expansion is generally outside scope, but record whether there is a non-commercial community benefit for the agent to evaluate.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "free-distribution",
+            "label": "Free or no-cost distribution component",
+            "helpText": "A dedicated no-cost component such as a pantry shelf, community fridge, or free bag program alongside any retail activity."
+          },
+          {
+            "value": "discount-produce",
+            "label": "Discounted fresh produce for eligible residents",
+            "helpText": "A sliding-scale or income-based discount program for fresh produce that reduces the cost for low-income households."
+          },
+          {
+            "value": "standard-retail-only",
+            "label": "Standard retail sales only",
+            "helpText": "The project operates as a standard-priced retail store with no dedicated free or reduced-cost food component."
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-retail-to-match",
+            "condition": {
+              "answer": "food-retail-community-benefit",
+              "in": [
+                "free-distribution",
+                "discount-produce",
+                "standard-retail-only"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "food-matching-funds"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-matching-funds",
+        "prompt": "How much confirmed matching support do you have?",
+        "helpText": "Include cash and documented in-kind support. Enter 0 if none is confirmed yet.",
+        "answerType": "currency",
+        "required": true,
+        "validation": {
+          "min": 0,
+          "max": 100000
+        },
+        "edges": [
+          {
+            "id": "food-match-recorded",
+            "condition": {
+              "answer": "food-matching-funds",
+              "operator": "gte",
+              "value": 0
+            },
+            "target": {
+              "type": "question",
+              "id": "food-launch-readiness"
+            }
+          }
+        ]
+      },
+      {
+        "id": "food-launch-readiness",
+        "prompt": "When could the project begin after award notice?",
+        "helpText": "Choose the earliest realistic start window after grant approval.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "within-30-days",
+            "label": "Within 30 days"
+          },
+          {
+            "value": "one-to-three-months",
+            "label": "One to three months"
+          },
+          {
+            "value": "more-than-three-months",
+            "label": "More than three months"
+          }
+        ],
+        "edges": [
+          {
+            "id": "food-to-confirmation",
+            "condition": {
+              "answer": "food-launch-readiness",
+              "in": [
+                "within-30-days",
+                "one-to-three-months",
+                "more-than-three-months"
+              ]
+            },
+            "target": {
+              "type": "terminal",
+              "id": "food-terminal-confirmation"
+            }
+          }
+        ]
+      }
+    ],
+    "terminals": [
+      {
+        "id": "food-terminal-confirmation",
+        "status": "ready-for-confirmation",
+        "title": "Confirm your food resilience answers",
+        "message": "Review the complete answer summary. After confirmation, the agent will assess eligibility against the food resilience rules and explain any gaps."
+      }
+    ]
+  },
+  "eligibilityRules": [
+    {
+      "id": "food-rule-applicant-type",
+      "criterion": "The applicant must be a nonprofit organization or public school that can sign the grant agreement for the project.",
+      "condition": {
+        "answer": "food-applicant-type",
+        "in": [
+          "nonprofit",
+          "public-school"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Apply through a nonprofit organization or public school that can sign the grant agreement, or obtain one as a fiscal sponsor before applying."
+    },
+    {
+      "id": "food-rule-service-area",
+      "criterion": "The project must primarily serve people in the eligible region and include a documented low-access food focus.",
+      "condition": {
+        "answer": "food-service-area",
+        "in": [
+          "low-access-neighborhood",
+          "citywide-with-low-access-focus"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Revise the project so the primary beneficiaries are in the eligible region and document the low-access neighborhood served."
+    },
+    {
+      "id": "food-rule-request-cap",
+      "criterion": "The requested grant amount must be no more than 25000 USD.",
+      "condition": {
+        "answer": "food-request-amount",
+        "operator": "lte",
+        "value": 25000
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Reduce the grant request to 25000 USD or less, or split costs so only eligible expenses are requested from this fund."
+    },
+    {
+      "id": "food-rule-project-type",
+      "criterion": "The project must be a non-commercial food access project, such as a mobile pantry, fresh food distribution effort, or community garden.",
+      "condition": {
+        "answer": "food-project-type",
+        "in": [
+          "mobile-pantry",
+          "community-garden"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Reframe the project around non-commercial food access, such as free or low-cost distribution, pantry logistics, or a community growing site."
+    },
+    {
+      "id": "food-rule-garden-site",
+      "criterion": "For community garden projects, the applicant must have secured or pending written access to the garden site.",
+      "appliesWhen": {
+        "answer": "food-project-type",
+        "equals": "community-garden"
+      },
+      "condition": {
+        "answer": "food-land-access",
+        "in": [
+          "secured",
+          "pending-written-approval"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Identify a garden site and obtain ownership documentation, a lease, or written permission from the site owner before applying."
+    },
+    {
+      "id": "food-rule-pantry-partner",
+      "criterion": "For mobile pantry or fresh food distribution projects, the applicant should have a named supplier or distribution partner.",
+      "appliesWhen": {
+        "answer": "food-project-type",
+        "equals": "mobile-pantry"
+      },
+      "condition": {
+        "answer": "food-pantry-partner",
+        "equals": true
+      },
+      "severity": "soft-advisory",
+      "remediation": "Secure a named food supplier, pantry network, school, or distribution partner and include their letter of intent to strengthen the application."
+    },
+    {
+      "id": "food-rule-match",
+      "criterion": "The application should document at least 2500 USD in confirmed cash or in-kind matching support.",
+      "condition": {
+        "answer": "food-matching-funds",
+        "operator": "gte",
+        "value": 2500
+      },
+      "severity": "soft-advisory",
+      "remediation": "Document additional cash or in-kind support. For a 25000 USD request, target at least 2500 USD in confirmed match; scale proportionally for smaller requests."
+    }
+  ]
+}

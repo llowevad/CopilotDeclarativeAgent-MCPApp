@@ -1,0 +1,352 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/copilot/plugin/v2.4/schema.json",
+  "schema_version": "v2.4",
+  "name_for_human": "Grant Advisor",
+  "description_for_human": "Find grant funds, open questionnaires, and retrieve criteria for eligibility guidance.",
+  "contact_email": "publisher-email@example.com",
+  "namespace": "granteligibility",
+  "functions": [
+    {
+      "name": "list_funds",
+      "description": "Lists available grant or funding programs that the user can explore or apply for. Use this when the user asks what grants, funds, programs, or opportunities are available, or asks which questionnaire they can start.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Optional category filter such as education, community, research, or small business."
+          },
+          "search": {
+            "type": "string",
+            "description": "Optional user search text for fund name or description."
+          }
+        }
+      },
+      "capabilities": {
+        "response_semantics": {
+          "data_path": "$.results",
+          "properties": {
+            "title": "$.name",
+            "subtitle": "$.shortDescription",
+            "url": "$.sourceUrl"
+          },
+          "static_template": {
+            "type": "AdaptiveCard",
+            "version": "1.4",
+            "body": [
+              {
+                "type": "TextBlock",
+                "text": "${title}",
+                "weight": "bolder",
+                "size": "medium",
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "${subtitle}",
+                "isSubtle": true,
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "Why this source: the SharePoint program guide is the record of this fund's eligibility rules, funding amounts, and how to apply.",
+                "size": "small",
+                "isSubtle": true,
+                "wrap": true,
+                "spacing": "small"
+              }
+            ],
+            "selectAction": {
+              "type": "OpenUrl",
+              "url": "${url}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "get_fund_details",
+      "description": "Gets browsing details for one grant or funding program, including purpose, a short eligibility summary, expected questionnaire length, and application guidance. Use this before answering general questions about a specific fund or before helping the user decide whether to start its questionnaire. Do not use this tool for final eligibility assessment.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fundId": {
+            "type": "string",
+            "description": "Identifier of the fund to describe. Must match a fundId from list_funds."
+          }
+        },
+        "required": [
+          "fundId"
+        ]
+      },
+      "capabilities": {
+        "response_semantics": {
+          "data_path": "$",
+          "properties": {
+            "title": "$.name",
+            "subtitle": "$.fundId",
+            "url": "$.sourceUrl"
+          },
+          "static_template": {
+            "type": "AdaptiveCard",
+            "version": "1.4",
+            "body": [
+              {
+                "type": "TextBlock",
+                "text": "${title}",
+                "weight": "bolder",
+                "size": "medium",
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "${subtitle}",
+                "isSubtle": true,
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "Why this source: the SharePoint program guide is the record of this fund's purpose, eligibility summary, and application steps.",
+                "size": "small",
+                "isSubtle": true,
+                "wrap": true,
+                "spacing": "small"
+              }
+            ],
+            "selectAction": {
+              "type": "OpenUrl",
+              "url": "${url}"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "start_questionnaire",
+      "description": "Opens the interactive questionnaire for a selected fund. Use this only when the user wants to answer eligibility questions for a specific fund. The tool returns the full question graph for the widget; it does not determine final eligibility.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fundId": {
+            "type": "string",
+            "description": "Identifier of the fund whose questionnaire should be opened."
+          },
+          "startAtQuestionId": {
+            "type": "string",
+            "description": "Optional questionId to focus when reopening after edit or recovery."
+          }
+        },
+        "required": [
+          "fundId"
+        ]
+      }
+    },
+    {
+      "name": "get_eligibility_criteria",
+      "description": "Returns the selected fund's eligibility criteria and evaluation guidance for agent-side assessment. Call this after the user submits confirmed questionnaire answers and before producing any eligibility outcome. Do not use browsing-time summaries or memory in place of this tool.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "fundId": {
+            "type": "string",
+            "description": "Identifier of the fund whose eligibility criteria should be retrieved for assessment. Must match a fundId from list_funds."
+          }
+        },
+        "required": [
+          "fundId"
+        ]
+      },
+      "capabilities": {
+        "response_semantics": {
+          "data_path": "$",
+          "properties": {
+            "title": "$.fundName",
+            "subtitle": "$.criteriaVersion",
+            "url": "$.sourceUrl"
+          },
+          "static_template": {
+            "type": "AdaptiveCard",
+            "version": "1.4",
+            "body": [
+              {
+                "type": "TextBlock",
+                "text": "${title}",
+                "weight": "bolder",
+                "size": "medium",
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "${subtitle}",
+                "isSubtle": true,
+                "wrap": true
+              },
+              {
+                "type": "TextBlock",
+                "text": "Why this source: the SharePoint program guide is the human-readable basis for the eligibility criteria used in this assessment.",
+                "size": "small",
+                "isSubtle": true,
+                "wrap": true,
+                "spacing": "small"
+              }
+            ],
+            "selectAction": {
+              "type": "OpenUrl",
+              "url": "${url}"
+            }
+          }
+        }
+      }
+    }
+  ],
+  "runtimes": [
+    {
+      "type": "RemoteMCPServer",
+      "spec": {
+        "url": "https://<your-app-name>.azurewebsites.net/mcp",
+        "mcp_tool_description": {
+          "tools": [
+            {
+              "name": "list_funds",
+              "title": "List grant funds",
+              "description": "Lists available grant or funding programs that the user can explore or apply for. Use this when the user asks what grants, funds, programs, or opportunities are available, or asks which questionnaire they can start.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "category": {
+                    "description": "Optional category filter such as education, community, research, or small business. Matches JSON fund categories.",
+                    "type": "string"
+                  },
+                  "search": {
+                    "description": "Optional user search text for fund name or description. Do not use for fund-specific logic.",
+                    "type": "string",
+                    "maxLength": 100
+                  }
+                }
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            },
+            {
+              "name": "get_fund_details",
+              "title": "Get fund details",
+              "description": "Gets browsing details for one grant or funding program, including purpose, a short eligibility summary, expected questionnaire length, and application guidance from JSON. Use this before answering general questions about a specific fund or before helping the user decide whether to start its questionnaire. Do not use this tool for final eligibility assessment.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "fundId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Identifier of the fund to describe. Must match a fundId from list_funds or JSON data."
+                  }
+                },
+                "required": [
+                  "fundId"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            },
+            {
+              "name": "start_questionnaire",
+              "title": "Start eligibility questionnaire",
+              "description": "Opens the interactive MCP App questionnaire for a selected fund. Use this only when the user wants to answer eligibility questions for a specific fund. The tool returns the full generic question graph for the widget; it does not determine final eligibility.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "fundId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Identifier of the fund whose questionnaire should be opened."
+                  },
+                  "answers": {
+                    "description": "Optional prefill answers keyed by questionId, used only when reopening or resuming from known context.",
+                    "type": "object",
+                    "propertyNames": {
+                      "type": "string"
+                    },
+                    "additionalProperties": {
+                      "anyOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      ]
+                    }
+                  },
+                  "startAtQuestionId": {
+                    "description": "Optional questionId to focus when reopening after edit or recovery. Must be reachable under supplied answers.",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "fundId"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              },
+              "_meta": {
+                "ui": {
+                  "resourceUri": "ui://grant-eligibility/questionnaire.html",
+                  "visibility": [
+                    "model",
+                    "app"
+                  ]
+                },
+                "ui/resourceUri": "ui://grant-eligibility/questionnaire.html"
+              }
+            },
+            {
+              "name": "get_eligibility_criteria",
+              "title": "Get eligibility criteria",
+              "description": "Returns the selected fund's eligibility criteria and evaluation guidance for agent-side assessment. Call this after the user submits confirmed questionnaire answers and before producing any eligibility outcome. Do not use browsing-time summaries or memory in place of this tool.",
+              "inputSchema": {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "type": "object",
+                "properties": {
+                  "fundId": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "Identifier of the fund whose eligibility criteria should be retrieved for assessment. Must match a fundId from list_funds or JSON data."
+                  }
+                },
+                "required": [
+                  "fundId"
+                ]
+              },
+              "annotations": {
+                "readOnlyHint": true
+              }
+            }
+          ]
+        }
+      },
+      "run_for_functions": [
+        "list_funds",
+        "get_fund_details",
+        "start_questionnaire",
+        "get_eligibility_criteria"
+      ],
+      "auth": {
+        "type": "None"
+      }
+    }
+  ]
+}

@@ -1,0 +1,549 @@
+{
+  "schemaVersion": "1.0.0",
+  "fund": {
+    "id": "rural-clinic-digital-access-grant",
+    "displayName": "Rural Clinic Digital Access Grant",
+    "shortSummary": "Capital support for small rural care providers adding telehealth equipment or clinic broadband capacity.",
+    "category": "Health infrastructure",
+    "sector": "Digital health",
+    "audience": [
+      "Independent rural clinics",
+      "Mobile health units",
+      "Federally qualified clinic lookalikes in rural areas"
+    ],
+    "fundingRange": {
+      "currency": "USD",
+      "min": 15000,
+      "max": 75000
+    },
+    "applicationWindow": {
+      "opens": "2026-10-01",
+      "deadline": "2027-01-31",
+      "timezone": "America/New_York"
+    },
+    "questionGraphId": "rural-clinic-digital-questionnaire",
+    "eligibilityRuleSetId": "rural-clinic-digital-eligibility-v1",
+    "programGuideUrl": "https://<your-tenant>.sharepoint.com/sites/GrantAdvisor/Shared%20Documents/Program%20Guides/Rural-Clinic-Digital-Access-Grant-Program-Guide.docx",
+    "recommendationSignals": {
+      "keywords": [
+        "rural clinic",
+        "telehealth",
+        "broadband",
+        "patient access",
+        "mobile care"
+      ],
+      "goodFit": [
+        "Applicant is a rural clinic or mobile health unit",
+        "Project improves telehealth or clinic connectivity",
+        "Clinic can attest to patient privacy controls"
+      ],
+      "poorFit": [
+        "Applicant sells software instead of delivering care",
+        "Project is only billing or back-office software",
+        "Site is urban"
+      ]
+    }
+  },
+  "evaluationGuidance": {
+    "reviewPriorities": "Resolve hard-disqualifier checks before competitiveness signals: the applicant must deliver care, the funded site or mobile unit must be rural or frontier, the focus must be telehealth equipment or broadband/network capacity, and privacy attestation must be in place.",
+    "borderlineHandling": "For telehealth equipment, 199 annual patients misses the patient-volume criterion; do not round up. Broadband readiness requires a carrier quote or engineering plan, not a general intent to improve service. Local match below 5000 USD is advisory, not a hard failure.",
+    "definitions": "Care delivery provider means the organization serving patients and operating the asset. Broadband or network capacity includes connectivity hardware, installation, or carrier service upgrades; billing-only tools are back-office software.",
+    "communicationEmphasis": "Keep the tone operational and reassuring for small providers. Distinguish eligibility gaps from readiness gaps, and direct applicants to concrete fixes: apply through the care provider, narrow the site, or complete privacy controls."
+  },
+  "questionGraph": {
+    "id": "rural-clinic-digital-questionnaire",
+    "entryQuestionId": "clinic-applicant-type",
+    "progress": {
+      "strategy": "current-path-estimate",
+      "unit": "question",
+      "displayHint": "Show answered questions over answered plus shortest remaining reachable questions from the current node."
+    },
+    "questions": [
+      {
+        "id": "clinic-applicant-type",
+        "prompt": "What type of organization is applying?",
+        "helpText": "Choose the organization that would own the funded equipment or broadband contract.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "independent-rural-clinic",
+            "label": "Independent rural clinic",
+            "helpText": "A standalone primary or specialty care clinic that is not part of a hospital network and delivers direct patient care."
+          },
+          {
+            "value": "mobile-health-unit",
+            "label": "Mobile health unit",
+            "helpText": "A vehicle-based care delivery unit that travels to patients in rural or frontier areas."
+          },
+          {
+            "value": "hospital-system",
+            "label": "Hospital system",
+            "helpText": "A multi-facility health system with at least one rural or frontier patient care site that would own the funded asset."
+          },
+          {
+            "value": "software-vendor",
+            "label": "Software vendor",
+            "helpText": "A company that develops or sells health IT software but does not itself deliver direct patient care."
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-applicant-care-provider",
+            "condition": {
+              "answer": "clinic-applicant-type",
+              "in": [
+                "independent-rural-clinic",
+                "mobile-health-unit",
+                "hospital-system"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-service-county"
+            }
+          },
+          {
+            "id": "clinic-applicant-vendor",
+            "condition": {
+              "answer": "clinic-applicant-type",
+              "equals": "software-vendor"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-service-county"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-service-county",
+        "prompt": "What type of county will the funded site primarily serve?",
+        "helpText": "Use the county classification of the patient care site or mobile unit home base.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "rural",
+            "label": "Rural county",
+            "helpText": "A county with a rural designation under USDA or HRSA classification; typically low population density outside metropolitan statistical areas."
+          },
+          {
+            "value": "frontier",
+            "label": "Frontier county",
+            "helpText": "A county with very low population density, typically six or fewer people per square mile, and limited health service infrastructure."
+          },
+          {
+            "value": "urban",
+            "label": "Urban county",
+            "helpText": "A metropolitan or suburban county that does not meet rural or frontier classification under federal definitions."
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-county-rural-frontier",
+            "condition": {
+              "answer": "clinic-service-county",
+              "in": [
+                "rural",
+                "frontier"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-project-focus"
+            }
+          },
+          {
+            "id": "clinic-county-urban",
+            "condition": {
+              "answer": "clinic-service-county",
+              "equals": "urban"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-project-focus"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-project-focus",
+        "prompt": "What is the primary project focus?",
+        "helpText": "Telehealth equipment, broadband upgrades, and billing software follow different readiness checks.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "telehealth-equipment",
+            "label": "Telehealth exam equipment",
+            "helpText": "Devices that enable clinical exams or consultations remotely, such as digital cameras, connected stethoscopes, or telehealth carts."
+          },
+          {
+            "value": "broadband-upgrade",
+            "label": "Broadband or network upgrade",
+            "helpText": "Connectivity infrastructure such as fiber installation, router upgrades, or a new carrier service contract for the clinic or mobile unit."
+          },
+          {
+            "value": "billing-software",
+            "label": "Billing or back-office software",
+            "helpText": "Software used primarily for claims processing, scheduling, or administrative operations rather than direct patient interaction."
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-focus-telehealth",
+            "condition": {
+              "answer": "clinic-project-focus",
+              "equals": "telehealth-equipment"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-annual-patients"
+            }
+          },
+          {
+            "id": "clinic-focus-broadband",
+            "condition": {
+              "answer": "clinic-project-focus",
+              "equals": "broadband-upgrade"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-broadband-plan"
+            }
+          },
+          {
+            "id": "clinic-focus-billing",
+            "condition": {
+              "answer": "clinic-project-focus",
+              "equals": "billing-software"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-billing-use-case"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-annual-patients",
+        "prompt": "How many unique patients did the site serve last year?",
+        "helpText": "Use an estimate if the final annual report is not yet complete.",
+        "answerType": "number",
+        "required": true,
+        "validation": {
+          "min": 0,
+          "max": 1000000
+        },
+        "edges": [
+          {
+            "id": "clinic-volume-sufficient",
+            "condition": {
+              "answer": "clinic-annual-patients",
+              "operator": "gte",
+              "value": 200
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-local-match"
+            }
+          },
+          {
+            "id": "clinic-volume-too-low",
+            "condition": {
+              "answer": "clinic-annual-patients",
+              "operator": "lt",
+              "value": 200
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-local-match"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-broadband-plan",
+        "prompt": "What evidence do you have for the broadband upgrade?",
+        "helpText": "A carrier quote or engineering plan shows the project is ready to price and implement.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "carrier-quote",
+            "label": "Carrier quote",
+            "helpText": "A written cost estimate from a telecom or internet service provider specifying service scope, pricing, and delivery timeline."
+          },
+          {
+            "value": "engineering-plan",
+            "label": "Engineering plan",
+            "helpText": "A technical design document identifying the infrastructure changes, equipment, and implementation steps required."
+          },
+          {
+            "value": "no-plan",
+            "label": "No plan yet",
+            "helpText": "No formal document exists yet; the upgrade is at the idea or interest stage without a specific vendor or design."
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-broadband-ready",
+            "condition": {
+              "answer": "clinic-broadband-plan",
+              "in": [
+                "carrier-quote",
+                "engineering-plan"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-local-match"
+            }
+          },
+          {
+            "id": "clinic-broadband-not-ready",
+            "condition": {
+              "answer": "clinic-broadband-plan",
+              "equals": "no-plan"
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-local-match"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-billing-use-case",
+        "prompt": "What is the main purpose of the billing or back-office software request?",
+        "helpText": "Record whether the request is tied to patient access or only administrative operations for the agent review.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "telehealth-scheduling",
+            "label": "Telehealth scheduling or access support",
+            "helpText": "Software used to book and manage telehealth appointments or connect patients to remote clinical visits."
+          },
+          {
+            "value": "claims-processing",
+            "label": "Claims or billing processing",
+            "helpText": "Software used to submit insurance claims, check eligibility, or manage revenue cycle operations."
+          },
+          {
+            "value": "general-administration",
+            "label": "General administration",
+            "helpText": "Software for back-office tasks such as HR, payroll, or internal operations not tied to patient access or clinical workflows."
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-billing-to-match",
+            "condition": {
+              "answer": "clinic-billing-use-case",
+              "in": [
+                "telehealth-scheduling",
+                "claims-processing",
+                "general-administration"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-local-match"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-local-match",
+        "prompt": "How much local matching support is committed?",
+        "helpText": "Include cash, equipment donations, waived installation costs, or documented in-kind technical labor.",
+        "answerType": "currency",
+        "required": true,
+        "validation": {
+          "min": 0,
+          "max": 500000
+        },
+        "edges": [
+          {
+            "id": "clinic-match-recorded",
+            "condition": {
+              "answer": "clinic-local-match",
+              "operator": "gte",
+              "value": 0
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-implementation-timeline"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-implementation-timeline",
+        "prompt": "When could implementation begin after award notice?",
+        "helpText": "Use the first realistic date after procurement or carrier coordination can start.",
+        "answerType": "single-select",
+        "required": true,
+        "options": [
+          {
+            "value": "within-60-days",
+            "label": "Within 60 days"
+          },
+          {
+            "value": "two-to-six-months",
+            "label": "Two to six months"
+          },
+          {
+            "value": "more-than-six-months",
+            "label": "More than six months"
+          }
+        ],
+        "edges": [
+          {
+            "id": "clinic-timeline-to-privacy",
+            "condition": {
+              "answer": "clinic-implementation-timeline",
+              "in": [
+                "within-60-days",
+                "two-to-six-months",
+                "more-than-six-months"
+              ]
+            },
+            "target": {
+              "type": "question",
+              "id": "clinic-privacy-attestation"
+            }
+          }
+        ]
+      },
+      {
+        "id": "clinic-privacy-attestation",
+        "prompt": "Can the applicant attest that patient privacy and security controls are in place for the funded use?",
+        "helpText": "This includes policies, access controls, and staff training appropriate for telehealth or network operations.",
+        "answerType": "boolean",
+        "required": true,
+        "edges": [
+          {
+            "id": "clinic-to-confirmation",
+            "condition": {
+              "answer": "clinic-privacy-attestation",
+              "in": [
+                true,
+                false
+              ]
+            },
+            "target": {
+              "type": "terminal",
+              "id": "clinic-terminal-confirmation"
+            }
+          }
+        ]
+      }
+    ],
+    "terminals": [
+      {
+        "id": "clinic-terminal-confirmation",
+        "status": "ready-for-confirmation",
+        "title": "Confirm your rural clinic digital access answers",
+        "message": "Review the complete answer summary. After confirmation, the agent will assess eligibility against the rural clinic digital access rules and explain any gaps."
+      }
+    ]
+  },
+  "eligibilityRules": [
+    {
+      "id": "clinic-rule-applicant-type",
+      "criterion": "The applicant must be a care delivery provider that will own or operate the funded equipment or broadband assets, not a software or equipment vendor.",
+      "condition": {
+        "answer": "clinic-applicant-type",
+        "in": [
+          "independent-rural-clinic",
+          "mobile-health-unit",
+          "hospital-system"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Apply through the clinic, mobile health unit, or care delivery organization that will own and operate the funded assets; vendors may participate only as suppliers."
+    },
+    {
+      "id": "clinic-rule-geography",
+      "criterion": "The funded site or mobile unit home base must primarily serve a rural or frontier county.",
+      "condition": {
+        "answer": "clinic-service-county",
+        "in": [
+          "rural",
+          "frontier"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Limit the project to a rural or frontier patient care site, or document that the mobile unit is based in and primarily serves such a county."
+    },
+    {
+      "id": "clinic-rule-focus",
+      "criterion": "The project must fund telehealth equipment or broadband/network upgrades rather than billing or general back-office software.",
+      "condition": {
+        "answer": "clinic-project-focus",
+        "in": [
+          "telehealth-equipment",
+          "broadband-upgrade"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Replace billing or administrative software costs with eligible telehealth equipment, network hardware, installation, or broadband upgrade expenses."
+    },
+    {
+      "id": "clinic-rule-patient-volume",
+      "criterion": "For telehealth equipment projects, the funded site must serve at least 200 unique patients annually.",
+      "appliesWhen": {
+        "answer": "clinic-project-focus",
+        "equals": "telehealth-equipment"
+      },
+      "condition": {
+        "answer": "clinic-annual-patients",
+        "operator": "gte",
+        "value": 200
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Delay applying until the site can document at least 200 unique patients annually, or partner with another eligible clinic to meet the service threshold."
+    },
+    {
+      "id": "clinic-rule-broadband-readiness",
+      "criterion": "For broadband projects, the applicant must have a carrier quote or engineering plan identifying scope, cost, and implementation approach.",
+      "appliesWhen": {
+        "answer": "clinic-project-focus",
+        "equals": "broadband-upgrade"
+      },
+      "condition": {
+        "answer": "clinic-broadband-plan",
+        "in": [
+          "carrier-quote",
+          "engineering-plan"
+        ]
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Obtain a carrier quote or engineering plan that identifies scope, cost, and implementation approach before submitting the application."
+    },
+    {
+      "id": "clinic-rule-privacy",
+      "criterion": "The applicant must be able to attest that patient privacy and security controls are in place for the funded use.",
+      "condition": {
+        "answer": "clinic-privacy-attestation",
+        "equals": true
+      },
+      "severity": "hard-disqualifier",
+      "remediation": "Complete and document privacy policies, role-based access controls, and staff training before using grant-funded telehealth or network systems."
+    },
+    {
+      "id": "clinic-rule-local-match",
+      "criterion": "The application should document at least 5000 USD in committed local matching support.",
+      "condition": {
+        "answer": "clinic-local-match",
+        "operator": "gte",
+        "value": 5000
+      },
+      "severity": "soft-advisory",
+      "remediation": "Secure at least 5000 USD in committed cash, donated equipment, waived installation fees, or documented in-kind technical labor to make the application more competitive."
+    }
+  ]
+}

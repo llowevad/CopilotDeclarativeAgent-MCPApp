@@ -1,0 +1,30 @@
+# Squad: ignore runtime state (logs, inbox, sessions)
+# Note: .squad/casting/* is identity and MUST be committed to main, not ignored
+.squad/orchestration-log/
+.squad/log/
+.squad/decisions/inbox/
+.squad/sessions/
+.squad/.scratch/
+.squad/.cache/
+# Squad: SubSquad activation file (local to this machine)
+.squad-workstream
+
+# Node
+node_modules/
+dist/
+*.tsbuildinfo
+npm-debug.log*
+
+# Built widget bundles (produced by `npm run build:widget`)
+src/server/assets/
+src/server/shared/
+
+# Local environment
+.env
+.env.local
+*.local.json
+
+# Packaged agent output
+appPackage/build/
+infra/build/
+*.zip
