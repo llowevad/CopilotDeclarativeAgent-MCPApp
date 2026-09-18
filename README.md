@@ -47,6 +47,14 @@ The verdict is deliberately split out: the server provides data, the widget coll
 
 ![Agent eligibility result based on answers](images/widget-04-agent-result.png)
 
+## `src/widget` and cross-origin access
+
+**What `src/widget` is.** This folder holds the source for the MCP App widget — the React + Fluent UI single-page app that renders the branching eligibility questionnaire. `build.mts` bundles it with Vite into a single `questionnaire.html` (plus `questionnaire.js`) and copies the output into `src/server/assets/`. The MCP server then serves that bundle as a `ui://grant-eligibility/questionnaire.html` resource, registered with `registerAppResource` from `@modelcontextprotocol/ext-apps`, and links it to the `start_questionnaire` tool via `_meta.ui.resourceUri`. This is the [MCP Apps extension](https://modelcontextprotocol.io/extensions/apps/overview) pattern for adding interactive UI to an MCP server.
+Reference: [MCP Apps overview](https://modelcontextprotocol.io/extensions/apps/overview) · [Build an MCP App](https://modelcontextprotocol.io/extensions/apps/build)
+
+**Why `*.widget-renderer.usercontent.microsoft.com` is in the CORS allow-list.** Microsoft 365 Copilot doesn't render the widget from its own origin — it loads the widget's HTML/JS into a sandboxed iframe served from a per-server subdomain of `widget-renderer.usercontent.microsoft.com` (the subdomain is a SHA-256 hash of the MCP server's own domain), isolating each widget's origin from the host and from other widgets. That sandboxed origin is what actually issues the browser-side requests back to this MCP server, so the server's CORS policy must explicitly allow it, or the browser blocks the widget's calls even though the host itself trusts the server.
+Reference: [MCP apps in Microsoft 365 Copilot — Build interactive UI widgets](https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/plugin-mcp-apps)
+
 ## Prerequisites
 
 Planned stack:
@@ -56,6 +64,41 @@ Planned stack:
 - Microsoft 365 Copilot or Copilot Chat with custom app upload enabled
 - Azure subscription for App Service deployment
 - Microsoft Entra app registration for single sign-on before any real hand-off
+
+## Deploying the web app
+
+The MCP server is deployed to Azure App Service with [`infra/deploy.ps1`](infra/deploy.ps1). This is the only script needed to build and ship the server — it is not used for packaging the Copilot agent manifest or for provisioning Azure resources.
+
+**What it does, in order:**
+
+1. Confirms the active `az` subscription matches `-ExpectedSubscriptionId` (or `$env:AZURE_SUBSCRIPTION_ID`) and stops if it doesn't.
+2. Runs `npm run build` at the repo root, which builds the widget bundle and compiles the server.
+3. Stages a deployable copy of the server into `infra/build/server-package/`: `src/server/dist`, `src/server/assets`, `src/server/shared`, `data`, plus `package.json`/`package-lock.json`.
+4. Runs `npm install --omit=dev --ignore-scripts` inside that staging folder so only production dependencies ship.
+5. Zips the staged folder to `infra/build/mcpapp-server.zip` (built with forward-slash entry names so Linux App Service accepts it).
+6. Computes the widget's sandboxed CORS origin (`https://<sha256-of-hostname>.widget-renderer.usercontent.microsoft.com`) for the target App Service hostname and sets it, along with `m365.cloud.microsoft`, as `CORS_ALLOWED_ORIGINS`.
+7. Sets remaining App Service settings (`NODE_ENV`, `WEBSITE_NODE_DEFAULT_VERSION`, `SCM_DO_BUILD_DURING_DEPLOYMENT=false`) and the Node runtime, then deploys the zip with `az webapp deploy`.
+
+**Usage:**
+
+```powershell
+# Requires: az CLI logged in, an existing App Service already provisioned
+.\infra\deploy.ps1 `
+  -ResourceGroupName "rg-mcpapp-sample-wus2-<suffix>" `
+  -AppName "mcpapp-sample-<suffix>" `
+  -ExpectedSubscriptionId "<subscription-guid>"
+```
+
+All parameters are optional:
+
+| Parameter | Default | Purpose |
+|---|---|---|
+| `-ResourceGroupName` | `rg-mcpapp-sample-wus2-<hash>` | Resource group of the target App Service |
+| `-AppName` | `mcpapp-sample-<hash>` | App Service name to deploy to |
+| `-PackagePath` | `infra/build/mcpapp-server.zip` | Where the deployable zip is written |
+| `-ExpectedSubscriptionId` | `$env:AZURE_SUBSCRIPTION_ID` | Safety check against deploying to the wrong subscription |
+
+The default resource group/app names are derived from a short hash of the subscription ID, so re-running with no parameters targets the same App Service consistently once it exists.
 
 ## Disclaimer
 
